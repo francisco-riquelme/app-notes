@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+
+class AdminUserController extends Controller
+{
+    // Mostrar todos los usuarios
+    public function index(Request $request)
+    {
+        $busqueda = $request->input('busqueda');
+        $usuarios = User::when($busqueda, function($query, $busqueda) {
+            return $query->where('name', 'like', "%$busqueda%");
+        })->get();
+        return view('admin.users.index', compact('usuarios', 'busqueda'));
+    }
+
+    // Formulario de edición
+    public function edit(User $user)
+    {
+        return view('admin.users.edit', compact('user'));
+    }
+
+    // Guardar cambios
+    public function update(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:255',
+            'rol' => 'required|in:admin,user',
+            'password' => 'nullable|min:6|confirmed',
+        ]);
+        if ($data['password']) {
+            $user->password = bcrypt($data['password']);
+        }
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->telefono = $data['telefono'] ?? null;
+        $user->direccion = $data['direccion'] ?? null;
+        $user->rol = $data['rol'];
+        $user->save();
+        return redirect()->route('admin.users')->with('success', 'Usuario actualizado correctamente');
+    }
+}
