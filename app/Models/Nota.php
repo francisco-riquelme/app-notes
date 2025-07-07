@@ -15,7 +15,8 @@ class Nota extends Model
         'nota_2', 
         'nota_3',
         'nota_final',
-        'observaciones'
+        'observaciones',
+        'escuela'
     ];
 
     // Relación con el usuario

@@ -103,11 +103,13 @@ class NotaController extends Controller
         }
 
         $request->validate([
-            'archivo_csv' => 'required|file|mimes:csv,txt|max:2048'
+            'archivo' => 'required|file|mimes:csv,txt|max:2048',
+            'escuela' => 'required|in:1,2'
         ]);
 
-        $archivo = $request->file('archivo_csv');
-        $ruta = $archivo->storeAs('csv', 'notas_' . time() . '.csv');
+        $archivo = $request->file('archivo');
+        $escuela = $request->input('escuela');
+        $ruta = $archivo->storeAs('csv', 'notas_escuela_' . $escuela . '_' . time() . '.csv');
 
         // Leer el archivo CSV
         $handle = fopen(storage_path('app/' . $ruta), 'r');
@@ -125,7 +127,8 @@ class NotaController extends Controller
                     'nota_2' => $datos[2] ?: null,
                     'nota_3' => $datos[3] ?: null,
                     'nota_final' => $datos[4] ?: null,
-                    'observaciones' => $datos[5] ?? null
+                    'observaciones' => $datos[5] ?? null,
+                    'escuela' => $escuela
                 ];
 
                 // Verificar si el usuario existe
@@ -136,7 +139,7 @@ class NotaController extends Controller
 
                 // Crear o actualizar la nota
                 Nota::updateOrCreate(
-                    ['user_id' => $nota['user_id']],
+                    ['user_id' => $nota['user_id'], 'escuela' => $escuela],
                     $nota
                 );
 
@@ -148,7 +151,7 @@ class NotaController extends Controller
 
         fclose($handle);
 
-        $mensaje = "Se importaron {$importados} notas exitosamente.";
+        $mensaje = "Se importaron {$importados} notas de la escuela {$escuela} exitosamente.";
         if (!empty($errores)) {
             $mensaje .= " Errores: " . implode(', ', $errores);
         }

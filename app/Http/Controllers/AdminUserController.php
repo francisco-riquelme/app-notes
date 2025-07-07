@@ -45,4 +45,21 @@ class AdminUserController extends Controller
         $user->save();
         return redirect()->route('admin.users')->with('success', 'Usuario actualizado correctamente');
     }
+
+    // Eliminar usuario
+    public function destroy(User $user)
+    {
+        // No permitir que el admin se elimine a sí mismo
+        if ($user->id === auth()->id()) {
+            return redirect()->route('admin.users')->with('error', 'No puedes eliminar tu propia cuenta');
+        }
+
+        // Verificar que sea admin
+        if (auth()->user()->rol !== 'admin') {
+            return redirect()->route('admin.users')->with('error', 'No tienes permisos para realizar esta acción');
+        }
+
+        $user->delete();
+        return redirect()->route('admin.users')->with('success', 'Usuario eliminado correctamente');
+    }
 }

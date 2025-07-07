@@ -73,9 +73,9 @@ Route::middleware(['auth'])->group(function () {
     
     // Ruta para importar CSV (solo admin)
     Route::post('/notas/importar-csv', [NotaController::class, 'importarCSV'])->name('notas.importar-csv');
-    Route::get('/admin/importar', function () {
-        return view('notas.importar');
-    })->name('admin.importar');
+    Route::get('/admin/importar-notas', function () {
+        return view('admin.importar-notas');
+    })->name('admin.importar-notas');
 
     // Rutas de perfil
     Route::get('/perfil', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
@@ -86,6 +86,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/usuarios', [\App\Http\Controllers\AdminUserController::class, 'index'])->name('admin.users');
     Route::get('/admin/usuarios/{user}/editar', [\App\Http\Controllers\AdminUserController::class, 'edit'])->name('admin.users.edit');
     Route::post('/admin/usuarios/{user}/editar', [\App\Http\Controllers\AdminUserController::class, 'update'])->name('admin.users.update');
+    Route::delete('/admin/usuarios/{user}', [\App\Http\Controllers\AdminUserController::class, 'destroy'])->name('admin.users.destroy');
 });
 
 // Ruta temporal para crear usuario de prueba

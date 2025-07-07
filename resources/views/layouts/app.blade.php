@@ -33,6 +33,11 @@
                                 <i class="fas fa-users-cog"></i> Gestionar Usuarios
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold text-success-emphasis" href="{{ route('admin.importar-notas') }}">
+                                <i class="fas fa-file-import"></i> Importar Notas
+                            </a>
+                        </li>
                         @endif
                         <li class="nav-item">
                             <form action="{{ route('logout') }}" method="POST" class="d-inline">

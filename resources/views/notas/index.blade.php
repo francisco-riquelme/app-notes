@@ -8,7 +8,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">Mis Notas</h4>
                     @if(auth()->user()->rol === 'admin')
-                        <a href="{{ route('admin.importar') }}" class="btn btn-primary">
+                        <a href="{{ route('admin.importar-notas') }}" class="btn btn-primary">
                             <i class="fas fa-upload"></i> Importar CSV
                         </a>
                     @endif
