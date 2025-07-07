@@ -6,6 +6,24 @@
     <title>Notas de Alumnos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        .navbar .btn-outline-light {
+            border-width: 1px;
+            transition: all 0.3s ease;
+        }
+        .navbar .btn-outline-light:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-1px);
+        }
+        .navbar .btn-outline-light:active {
+            transform: translateY(0);
+        }
+        .navbar-nav .nav-item {
+            display: flex;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-success mb-4">
@@ -26,24 +44,6 @@
                             <a class="nav-link" href="{{ route('profile.show') }}">
                                 <i class="fas fa-user-circle"></i> Mi Perfil
                             </a>
-                        </li>
-                        @if(auth()->user()->rol === 'admin')
-                        <li class="nav-item">
-                            <a class="nav-link fw-bold text-success-emphasis" href="{{ route('admin.users') }}">
-                                <i class="fas fa-users-cog"></i> Gestionar Usuarios
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link fw-bold text-success-emphasis" href="{{ route('admin.importar-notas') }}">
-                                <i class="fas fa-file-import"></i> Importar Notas
-                            </a>
-                        </li>
-                        @endif
-                        <li class="nav-item">
-                            <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                                @csrf
-                                <button type="submit" class="btn btn-link nav-link text-success-emphasis" style="display:inline;cursor:pointer;">Cerrar sesión</button>
-                            </form>
                         </li>
                     @else
                         <li class="nav-item">

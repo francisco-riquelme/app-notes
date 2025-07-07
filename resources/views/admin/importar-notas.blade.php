@@ -15,15 +15,37 @@
                     </div>
                     
                     <div class="mb-5 text-center">
-                        <h5 class="text-success"><i class="fas fa-school me-2"></i>Escuela 1</h5>
-                        <form action="{{ route('notas.importar-csv') }}" method="POST" enctype="multipart/form-data">
+                        <h5 class="text-success"><i class="fas fa-school me-2"></i>Escuela de Suboficiales de Carabineros de Chile</h5>
+                        <div class="alert alert-info text-start">
+                            <strong>Instrucciones Formato 1:</strong><br>
+                            El archivo CSV debe tener las siguientes columnas (en este orden):<br>
+                            <code>codigo_funcionario, grado, nombre, unidad, escrito, oral, fisico, final, situacion, id_posicion, grupo</code><br>
+                        </div>
+                        <form action="{{ route('notas.importar-csv') }}" method="POST" enctype="multipart/form-data" class="mb-3">
                             @csrf
                             <input type="hidden" name="escuela" value="1">
+                            <input type="hidden" name="formato" value="1">
                             <div class="mb-3">
                                 <input type="file" name="archivo" class="form-control" accept=".csv,.txt" required>
                             </div>
                             <button type="submit" class="btn btn-success" style="background-color: #43a047; border-color: #388e3c;">
-                                <i class="fas fa-file-import"></i> Importar Notas Escuela 1
+                                <i class="fas fa-file-import"></i> Importar Notas Formato 1
+                            </button>
+                        </form>
+                        <div class="alert alert-info text-start mt-4">
+                            <strong>Instrucciones Formato 2:</strong><br>
+                            El archivo CSV debe tener las siguientes columnas (en este orden):<br>
+                            <code>codigo_funcionario, grado (número), nombre, unidad, sede, sexo, grado (texto), final, posicion</code><br>
+                        </div>
+                        <form action="{{ route('notas.importar-csv') }}" method="POST" enctype="multipart/form-data" class="mb-3">
+                            @csrf
+                            <input type="hidden" name="escuela" value="1">
+                            <input type="hidden" name="formato" value="2">
+                            <div class="mb-3">
+                                <input type="file" name="archivo" class="form-control" accept=".csv,.txt" required>
+                            </div>
+                            <button type="submit" class="btn btn-success" style="background-color: #43a047; border-color: #388e3c;">
+                                <i class="fas fa-file-import"></i> Importar Notas Formato 2
                             </button>
                         </form>
                     </div>
@@ -31,15 +53,26 @@
                     <hr>
                     
                     <div class="mb-3 text-center">
-                        <h5 class="text-primary"><i class="fas fa-school me-2"></i>Escuela 2</h5>
+                        <h5 class="text-success"><i class="fas fa-school me-2"></i>Academia de Ciencias Policiales de Carabineros de Chile</h5>
+                        <div class="alert alert-info text-start">
+                            <strong>Instrucciones:</strong><br>
+                            El archivo CSV debe tener las siguientes columnas (en este orden):<br>
+                            <code>codigo_funcionario, grado, nombre, unidad, escrito, oral, fisico, final, situacion, id_posicion, tipo</code><br>
+                            <br>
+                            <strong>Importante:</strong> El campo <b>tipo</b> debe ser:
+                            <ul>
+                                <li><b>1</b>: Intendencia</li>
+                                <li><b>2</b>: Orden y Seguridad</li>
+                            </ul>
+                        </div>
                         <form action="{{ route('notas.importar-csv') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="escuela" value="2">
                             <div class="mb-3">
                                 <input type="file" name="archivo" class="form-control" accept=".csv,.txt" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-file-import"></i> Importar Notas Escuela 2
+                            <button type="submit" class="btn btn-success" style="background-color: #43a047; border-color: #388e3c;">
+                                <i class="fas fa-file-import"></i> Importar Notas Academia de Ciencias Policiales
                             </button>
                         </form>
                     </div>

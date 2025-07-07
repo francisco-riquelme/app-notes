@@ -104,12 +104,17 @@ class NotaController extends Controller
 
         $request->validate([
             'archivo' => 'required|file|mimes:csv,txt|max:2048',
-            'escuela' => 'required|in:1,2'
+            'escuela' => 'required|in:1,2',
+            'formato' => 'nullable|in:1,2'
         ]);
 
         $archivo = $request->file('archivo');
         $escuela = $request->input('escuela');
+        $formato = $request->input('formato');
         $ruta = $archivo->storeAs('csv', 'notas_escuela_' . $escuela . '_' . time() . '.csv');
+
+        // Obtener el id de la escuela
+        $escuela_id = $escuela;
 
         // Leer el archivo CSV
         $handle = fopen(storage_path('app/' . $ruta), 'r');
@@ -120,29 +125,61 @@ class NotaController extends Controller
 
         while (($datos = fgetcsv($handle)) !== false) {
             try {
-                // Asumiendo que el CSV tiene: user_id, nota_1, nota_2, nota_3, nota_final, observaciones
-                $nota = [
-                    'user_id' => $datos[0],
-                    'nota_1' => $datos[1] ?: null,
-                    'nota_2' => $datos[2] ?: null,
-                    'nota_3' => $datos[3] ?: null,
-                    'nota_final' => $datos[4] ?: null,
-                    'observaciones' => $datos[5] ?? null,
-                    'escuela' => $escuela
-                ];
-
-                // Verificar si el usuario existe
-                if (!User::find($nota['user_id'])) {
-                    $errores[] = "Usuario ID {$nota['user_id']} no existe";
+                // Determinar formato y mapear columnas
+                if ($escuela == 1 && $formato == 1) {
+                    // Formato 1 Escuela 1
+                    // codigo_funcionario, grado, nombre, unidad, escrito, oral, fisico, final, situacion, id_posicion, grupo
+                    $nota = [
+                        'user_id' => null, // No se asocia usuario
+                        'nota_1' => $datos[4] ?: null,
+                        'nota_2' => $datos[5] ?: null,
+                        'nota_3' => $datos[6] ?: null,
+                        'nota_final' => $datos[7] ?: null,
+                        'observaciones' => $datos[8] ?? null,
+                        'escuela_id' => $escuela_id,
+                        'escalafon_id' => null // No hay tipo en este formato
+                    ];
+                } elseif ($escuela == 1 && $formato == 2) {
+                    // Formato 2 Escuela 1
+                    // codigo_funcionario, grado (número), nombre, unidad, sede, sexo, grado (texto), final, posicion
+                    $nota = [
+                        'user_id' => null,
+                        'nota_1' => null,
+                        'nota_2' => null,
+                        'nota_3' => null,
+                        'nota_final' => $datos[7] ?: null,
+                        'observaciones' => null,
+                        'escuela_id' => $escuela_id,
+                        'escalafon_id' => null
+                    ];
+                } elseif ($escuela == 2) {
+                    // Formato Escuela 2
+                    // codigo_funcionario, grado, nombre, unidad, escrito, oral, fisico, final, situacion, id_posicion, tipo
+                    $tipo = isset($datos[11]) ? $datos[11] : null;
+                    // Buscar el id de escalafon
+                    $escalafon_id = null;
+                    if ($tipo == 1 || $tipo == '1') {
+                        $escalafon_id = 1;
+                    } elseif ($tipo == 2 || $tipo == '2') {
+                        $escalafon_id = 2;
+                    }
+                    $nota = [
+                        'user_id' => null,
+                        'nota_1' => $datos[4] ?: null,
+                        'nota_2' => $datos[5] ?: null,
+                        'nota_3' => $datos[6] ?: null,
+                        'nota_final' => $datos[7] ?: null,
+                        'observaciones' => $datos[8] ?? null,
+                        'escuela_id' => $escuela_id,
+                        'escalafon_id' => $escalafon_id
+                    ];
+                } else {
+                    $errores[] = "Formato o escuela no reconocido";
                     continue;
                 }
 
-                // Crear o actualizar la nota
-                Nota::updateOrCreate(
-                    ['user_id' => $nota['user_id'], 'escuela' => $escuela],
-                    $nota
-                );
-
+                // Crear la nota
+                \App\Models\Nota::create($nota);
                 $importados++;
             } catch (\Exception $e) {
                 $errores[] = "Error en línea: " . implode(',', $datos) . " - " . $e->getMessage();

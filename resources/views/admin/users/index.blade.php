@@ -8,7 +8,11 @@
                 <div class="card-header bg-success text-white">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="mb-0"><i class="fas fa-users me-2"></i>Gestión de Usuarios</h4>
-                        <span class="badge bg-light text-dark">{{ $usuarios->count() }} usuarios</span>
+                        <span class="d-flex align-items-center" style="gap: 0.5rem;">
+                            <span class="fs-5 fw-bold badge rounded-pill bg-light text-success px-4 py-2" style="font-size:1.3rem;box-shadow:0 2px 8px rgba(25,135,84,0.10);">
+                                <i class="fas fa-user-friends me-2"></i> {{ $usuarios->count() }}
+                            </span>
+                        </span>
                     </div>
                 </div>
                 <div class="card-body">
@@ -69,7 +73,7 @@
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <a href="{{ route('admin.users.edit', $usuario) }}" 
-                                                   class="btn btn-sm btn-outline-success">
+                                                   class="btn btn-sm btn-outline-success me-2">
                                                     <i class="fas fa-edit"></i> Editar
                                                 </a>
                                                 @if($usuario->id !== auth()->id())

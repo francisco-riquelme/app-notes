@@ -24,4 +24,14 @@ class Nota extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function escuela()
+    {
+        return $this->belongsTo(Escuela::class, 'escuela_id');
+    }
+
+    public function escalafon()
+    {
+        return $this->belongsTo(Escalafon::class, 'escalafon_id');
+    }
 }

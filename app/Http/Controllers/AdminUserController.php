@@ -14,6 +14,14 @@ class AdminUserController extends Controller
         $usuarios = User::when($busqueda, function($query, $busqueda) {
             return $query->where('name', 'like', "%$busqueda%");
         })->get();
+        // Mover el usuario admin autenticado al principio
+        if (auth()->check()) {
+            $admin = $usuarios->where('id', auth()->id())->first();
+            if ($admin) {
+                $usuarios = $usuarios->reject(fn($u) => $u->id === $admin->id);
+                $usuarios->prepend($admin);
+            }
+        }
         return view('admin.users.index', compact('usuarios', 'busqueda'));
     }
 
