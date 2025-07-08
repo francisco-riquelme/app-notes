@@ -22,6 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'rol',
+        'codigo_funcionario',
+        'escuela',
         'telefono',
         'direccion',
     ];
@@ -44,4 +46,19 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Obtener el nombre de la escuela del usuario
+     */
+    public function getNombreEscuelaAttribute()
+    {
+        switch ($this->escuela) {
+            case 1:
+                return 'Escuela de Suboficiales de Carabineros de Chile (ESUCAR)';
+            case 2:
+                return 'Academia de Ciencias Policiales de Carabineros de Chile (ACIPOL)';
+            default:
+                return 'Escuela no especificada';
+        }
+    }
 }

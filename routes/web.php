@@ -19,10 +19,10 @@ use Illuminate\Support\Facades\Redirect;
 */
 
 Route::get('/', function () {
-    return redirect()->route('notas.index');
+    return redirect()->route('home.index');
 });
 
-// Rutas de autenticación (temporales para pruebas)
+// Rutas de autenticación
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
@@ -36,7 +36,7 @@ Route::post('/login', function (Request $request) {
     $user = User::where('email', $credentials['email'])->first();
     if ($user && \Illuminate\Support\Facades\Hash::check($credentials['password'], $user->password)) {
         Auth::login($user);
-        return redirect()->route('notas.index');
+        return redirect()->route('home.index');
     }
     return back()->withErrors(['email' => 'Credenciales incorrectas'])->withInput();
 });
@@ -58,7 +58,7 @@ Route::post('/register', function (Request $request) {
         'rol' => 'user',
     ]);
     Auth::login($user);
-    return redirect()->route('notas.index')->with('success', '¡Registro exitoso! Bienvenido al sistema.');
+    return redirect()->route('home.index')->with('success', '¡Registro exitoso! Bienvenido al sistema.');
 });
 
 Route::post('/logout', function () {
@@ -68,14 +68,25 @@ Route::post('/logout', function () {
 
 // Rutas protegidas (requieren autenticación)
 Route::middleware(['auth'])->group(function () {
-    // Rutas de notas
-    Route::resource('notas', NotaController::class);
+    // Rutas del panel principal
+    Route::resource('home', NotaController::class);
+    
+    // Ruta para búsqueda de alumnos (solo admin)
+    Route::get('/notas/buscar', [NotaController::class, 'search'])->name('notas.search');
+    
+    // Ruta para que usuarios vean sus notas personales
+    Route::get('/mis-notas', [NotaController::class, 'misNotas'])->name('notas.mis-notas');
+    
+    // Rutas para editar notas (solo admin)
+    Route::get('/notas/{id}/editar', [NotaController::class, 'editNota'])->name('notas.edit');
+    Route::post('/notas/{id}/actualizar', [NotaController::class, 'updateNota'])->name('notas.update');
+    Route::delete('/notas/{id}', [NotaController::class, 'destroyNota'])->name('notas.destroy');
     
     // Ruta para importar CSV (solo admin)
-    Route::post('/notas/importar-csv', [NotaController::class, 'importarCSV'])->name('notas.importar-csv');
-    Route::get('/admin/importar-notas', function () {
+    Route::post('/home/importar-csv', [NotaController::class, 'importarCSV'])->name('home.importar-csv');
+    Route::get('/admin/importar-home', function () {
         return view('admin.importar-notas');
-    })->name('admin.importar-notas');
+    })->name('admin.importar-home');
 
     // Rutas de perfil
     Route::get('/perfil', [\App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
@@ -87,23 +98,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin/usuarios/{user}/editar', [\App\Http\Controllers\AdminUserController::class, 'edit'])->name('admin.users.edit');
     Route::post('/admin/usuarios/{user}/editar', [\App\Http\Controllers\AdminUserController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/usuarios/{user}', [\App\Http\Controllers\AdminUserController::class, 'destroy'])->name('admin.users.destroy');
-});
-
-// Ruta temporal para crear usuario de prueba
-Route::get('/crear-usuario-prueba', function () {
-    $user = new \App\Models\User();
-    $user->name = 'Usuario Prueba';
-    $user->email = 'test@test.com';
-    $user->password = bcrypt('123456');
-    $user->rol = 'user';
-    $user->save();
-    
-    $admin = new \App\Models\User();
-    $admin->name = 'Administrador';
-    $admin->email = 'admin@test.com';
-    $admin->password = bcrypt('123456');
-    $admin->rol = 'admin';
-    $admin->save();
-    
-    return 'Usuarios creados: test@test.com (user) y admin@test.com (admin) - Contraseña: 123456';
 });

@@ -6,7 +6,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="mb-0">Importar Notas desde CSV</h4>
+                    <h4 class="mb-0">Importar Datos desde CSV</h4>
                 </div>
                 <div class="card-body">
                     @if(session('success'))
@@ -23,7 +23,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('notas.importar-csv') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('home.importar-csv') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
                             <label for="archivo_csv" class="form-label">Seleccionar archivo CSV</label>
@@ -45,11 +45,11 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('notas.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('home.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Volver
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-upload"></i> Importar Notas
+                                <i class="fas fa-upload"></i> Importar Datos
                             </button>
                         </div>
                     </form>

@@ -1,28 +1,63 @@
 @extends('layouts.app')
 
+@section('content')
+<button class="sidebar-toggler" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+<div class="sidebar d-flex flex-column justify-content-between" id="sidebarMenu">
+    <div>
+        <div class="user-name mb-4">
+            {{ strtoupper(auth()->user()->name) }}
+        </div>
+        <a href="{{ route('home.index') }}" class="nav-link-custom">
+            <i class="fas fa-home me-2"></i> Home
+        </a>
+        @if(auth()->user()->rol === 'admin')
+        <a href="{{ route('notas.search') }}" class="nav-link-custom">
+            <i class="fas fa-users me-2"></i> Gestión de Alumnos
+        </a>
+        <a href="{{ route('admin.importar-home') }}" class="nav-link-custom">
+            <i class="fas fa-file-import me-2"></i> Importar Datos
+        </a>
+        <a href="{{ route('admin.users') }}" class="nav-link-custom">
+            <i class="fas fa-users-cog me-2"></i> Gestionar Usuarios
+        </a>
+        @else
+        <a href="{{ route('notas.mis-notas') }}" class="nav-link-custom">
+            <i class="fas fa-graduation-cap me-2"></i> Mis Notas
+        </a>
+        @endif
+        <a href="{{ route('profile.show') }}" class="nav-link-custom">
+            <i class="fas fa-user-circle me-2"></i> Mi Perfil
+        </a>
+        <form action="{{ route('logout') }}" method="POST" class="mt-3">
+            @csrf
+            <button type="submit" class="nav-link-custom" style="width:100%;text-align:left;background:#c0392b;color:#fff;font-weight:bold;">
+                <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+            </button>
+        </form>
+    </div>
+    <div class="logo">
+        <img src="/img/logo-carabineros.png" alt="Logo Carabineros">
+    </div>
+</div>
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 position-relative">
+                <div class="welcome-bg"></div>
+                <div class="welcome-panel position-relative">
+                    <div class="welcome-title">BIENVENIDO</div>
+                    @if(auth()->user()->rol !== 'admin')
+                    <div class="welcome-user text-success fw-bold" style="font-size:2rem;">{{ auth()->user()->nombre_escuela }}</div>
+                    @endif
+                    <div class="welcome-sub">SISTEMA DE GESTIÓN DE NOTAS</div>
+                    <div class="welcome-sub">DIRECCIÓN DE TECNOLOGÍAS DE LA INFORMACIÓN Y LAS COMUNICACIONES</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-    body {
-        overflow-x: hidden;
-    }
-    .admin-gradient {
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #1e40af 100%);
-    }
-    .admin-btn {
-        background-color: #fff !important;
-        border-color: #fff !important;
-        color: #1e3a8a !important;
-        transition: all 0.3s ease;
-    }
-    .admin-btn:hover {
-        background-color: rgba(255, 255, 255, 0.9) !important;
-        border-color: #fff !important;
-        color: #1e3a8a !important;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-    .admin-card {
-        border: 2px solid #3b82f6;
-    }
     .sidebar {
         min-height: 100vh;
         height: 100vh;
@@ -153,77 +188,57 @@
     }
 </style>
 
-@section('content')
-<button class="sidebar-toggler" id="sidebarToggle"><i class="fas fa-bars"></i></button>
-<div class="sidebar d-flex flex-column justify-content-between" id="sidebarMenu">
-    <div>
-        <div class="user-name mb-4">
-            {{ strtoupper(auth()->user()->name) }}
-        </div>
-        <a href="{{ route('notas.index') }}" class="nav-link-custom">
-            <i class="fas fa-book me-2"></i> Notas
-        </a>
-        @if(auth()->user()->rol === 'admin')
-        <a href="{{ route('admin.importar-notas') }}" class="nav-link-custom">
-            <i class="fas fa-file-import me-2"></i> Importar Notas
-        </a>
-        <a href="{{ route('admin.users') }}" class="nav-link-custom">
-            <i class="fas fa-users-cog me-2"></i> Gestionar Usuarios
-        </a>
-        @endif
-        <a href="{{ route('profile.show') }}" class="nav-link-custom">
-            <i class="fas fa-user-circle me-2"></i> Perfil
-        </a>
-        <form action="{{ route('logout') }}" method="POST" class="mt-3">
-            @csrf
-            <button type="submit" class="nav-link-custom" style="width:100%;text-align:left;background:#c0392b;color:#fff;font-weight:bold;">
-                <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
-            </button>
-        </form>
-    </div>
-    <div class="logo">
-        <img src="/img/logo-carabineros.png" alt="Logo Carabineros">
-    </div>
-</div>
-<div class="main-content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-12 position-relative">
-                <div class="welcome-bg"></div>
-                <div class="welcome-panel position-relative">
-                    <div class="welcome-title">BIENVENIDO</div>
-                    {{-- <div class="welcome-user">"{{ strtoupper(auth()->user()->name) }}"</div> --}}
-                    <div class="welcome-sub">SISTEMA DE GESTIÓN DE NOTAS</div>
-                    <div class="welcome-sub">DIRECCIÓN DE TECNOLOGÍAS DE LA INFORMACIÓN Y LAS COMUNICACIONES</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <script>
     const sidebar = document.getElementById('sidebarMenu');
     const toggleBtn = document.getElementById('sidebarToggle');
     const links = sidebar.querySelectorAll('.nav-link-custom, form button.nav-link-custom');
-    // Abrir sidebar con animación al cargar
+    
+    // Verificar si el sidebar debe estar abierto (usando localStorage)
+    const sidebarOpen = localStorage.getItem('sidebarOpen') === 'true';
+    
+    // Abrir sidebar con animación al cargar si estaba abierto
     window.addEventListener('DOMContentLoaded', function() {
-        setTimeout(() => {
-            sidebar.classList.add('open');
-            // Animación secuencial de links
-            links.forEach((link, i) => {
-                setTimeout(() => link.classList.add('visible'), 200 + i * 120);
-            });
-        }, 200);
+        if (sidebarOpen) {
+            setTimeout(() => {
+                sidebar.classList.add('open');
+                // Animación secuencial de links
+                links.forEach((link, i) => {
+                    setTimeout(() => link.classList.add('visible'), 200 + i * 120);
+                });
+            }, 200);
+        } else {
+            // Si no estaba abierto, mostrar solo los links sin animación
+            links.forEach(link => link.classList.add('visible'));
+        }
     });
+    
     // Botón hamburguesa abre/cierra sidebar
     toggleBtn.addEventListener('click', function() {
         sidebar.classList.toggle('open');
-        if(sidebar.classList.contains('open')) {
+        const isOpen = sidebar.classList.contains('open');
+        
+        // Guardar estado en localStorage
+        localStorage.setItem('sidebarOpen', isOpen);
+        
+        if(isOpen) {
             links.forEach((link, i) => {
                 setTimeout(() => link.classList.add('visible'), 100 + i * 120);
             });
         } else {
             links.forEach(link => link.classList.remove('visible'));
         }
+    });
+    
+    // Mantener sidebar contraído al hacer clic en enlaces
+    links.forEach(link => {
+        link.addEventListener('click', function() {
+            // Cerrar sidebar si está abierto
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                localStorage.setItem('sidebarOpen', 'false');
+                links.forEach(link => link.classList.remove('visible'));
+            }
+        });
     });
 </script>
 @endsection 
